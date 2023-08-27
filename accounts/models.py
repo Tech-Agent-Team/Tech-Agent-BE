@@ -11,8 +11,3 @@ class CustomUser(AbstractUser):
     )
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='customer')
 
-    # def is_customer(self):
-    #     return hasattr(self, 'customerprofile')
-
-    # def is_technician(self):
-    #     return hasattr(self, 'technicianprofile')
