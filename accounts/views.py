@@ -5,6 +5,8 @@ from .serializers import CustomUserSerializer
 from .permissions import IsCustomerUser, IsTechnicianUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from datetime import datetime, timedelta
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
