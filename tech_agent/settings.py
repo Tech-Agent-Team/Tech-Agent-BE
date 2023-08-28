@@ -155,3 +155,7 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 ACCOUNT_UNIQUE_EMAIL = True
+
+
+MEDIA_URL = '/media/'
+MEDIA_DIR= BASE_DIR / 'media/'

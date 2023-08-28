@@ -33,7 +33,7 @@ class Order(models.Model):
     eta_arrival_time = models.IntegerField(default=0)
     description = models.TextField()
     technician_type = models.CharField(max_length=255)
-    image = models.CharField(max_length=255)
+    image =models.ImageField(upload_to='uploads/', blank=True,null=True)
     address = models.CharField(max_length=255)
     owner = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE)
     current_technician = models.ForeignKey(TechnicianProfile, on_delete=models.CASCADE, null=True, blank=True)
