@@ -1,7 +1,10 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from .serializers import TechnicianProfileSignUpSerializer
+from .serializers import TechnicianProfileSignUpSerializer,homeTechnicianSerializers
 from accounts.serializers import CustomUserSerializer
+from orders.models import Order
+from rest_framework.generics import ListAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveUpdateDestroyAPIView
+
 # from rest_framework.authtoken.models import Token
 # Create your views here.
 
@@ -19,4 +22,6 @@ class CustomerSignUpView(generics.GenericAPIView):
             }
         )
     
-
+class homeTechnicianView(ListCreateAPIView):
+    queryset= Order.objects.all()
+    serializer_class=homeTechnicianSerializers
