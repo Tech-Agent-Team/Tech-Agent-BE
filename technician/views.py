@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from .serializers import TechnicianProfileSignUpSerializer
 from accounts.serializers import CustomUserSerializer
-from rest_framework.authtoken.models import Token
+# from rest_framework.authtoken.models import Token
 # Create your views here.
 
 class CustomerSignUpView(generics.GenericAPIView):
@@ -14,7 +14,7 @@ class CustomerSignUpView(generics.GenericAPIView):
         return Response(
             {
                 "user": CustomUserSerializer(user, context = self.get_serializer_context()).data,
-                "token": Token.objects.get(user = user).key,
+                # "token": Token.objects.get(user = user).key,
                 "message":"account created successfully"
             }
         )

@@ -1,32 +1,26 @@
-
 from django.http import request
 from rest_framework import generics, permissions, status
-from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from .serializers import CustomUserSerializer
-# from customer.serializers import CustomerProfileSignUpSerializer
-# from technician.serializers import TechnicianProfileSignUpSerializer
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.views import APIView
 from .permissions import IsCustomerUser, IsTechnicianUser
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-class CustomAuthToken(ObtainAuthToken):
-    def post(self, request, *args, **kwargs):
-        serializer=self.serializer_class(data=request.data, context={'request':request})
-        serializer.is_valid(raise_exception=True)
-        user=serializer.validated_data['user']
-        token, created=Token.objects.get_or_create(user=user)
-        return Response({
-            'token':token.key,
-            'user_id':user.pk,
-            'is_customer':user.is_customer,
-            'is_technician':user.is_technician
-        })
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims
+        token["email"] = user.email
+        token["username"] = user.username
+        token['is_customer']=user.is_customer
+        token['is_technician']=user.is_technician
+        
+        return token
 
-class LogoutView(APIView):
-    def post(self, request, format=None):
-        request.auth.delete()
-        return Response(status=status.HTTP_200_OK)
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
 
 class CustomerOnlyView(generics.RetrieveAPIView):
     permission_classes=[permissions.IsAuthenticated&IsCustomerUser]
@@ -41,4 +35,3 @@ class TechnicianOnlyView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
-        # return self.request.user
