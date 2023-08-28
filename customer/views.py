@@ -22,3 +22,6 @@ class CustomerSignUpView(generics.GenericAPIView):
             }
         )
         
+class homeCustomerView(ListCreateAPIView):
+    queryset= TechnicianProfile.objects.all()
+    serializer_class=homeTechnicianSerializers

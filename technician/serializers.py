@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import TechnicianProfile
+from orders.models import Order
 from accounts.models import CustomUser
 
 # class TechnicianProfileSignUpSerializer(serializers.ModelSerializer):
@@ -60,6 +61,20 @@ class TechnicianProfileSignUpSerializer(serializers.ModelSerializer):
             description=self.validated_data['description']
         )
         return user
+    
+
+
+
+class homeTechnicianSerializers(serializers.ModelSerializer):
+    class Meta:
+        model=Order
+        fields=['description','image','technician_type','eta_arrival_time','location']
+
+
+
+
+
+        
 # {
 #   "username":"bayan",
 #   "email":"bayan@gmail.com",
