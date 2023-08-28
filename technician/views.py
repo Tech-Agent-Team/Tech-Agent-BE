@@ -26,3 +26,8 @@ class homeTechnicianView(ListCreateAPIView):
     permission_classes=[permissions.IsAuthenticated&IsTechnicianUser]
     queryset= Order.objects.all()
     serializer_class=homeTechnicianSerializers
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

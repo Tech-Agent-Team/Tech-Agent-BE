@@ -43,8 +43,7 @@ class TechnicianProfileSignUpSerializer(serializers.ModelSerializer):
 class homeTechnicianSerializers(serializers.ModelSerializer):
     class Meta:
         model=Order
-        fields=['description','image','technician_type','eta_arrival_time']
-
+        fields=['id','description','image','technician_type','eta_arrival_time']
 
 
 
