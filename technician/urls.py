@@ -6,6 +6,6 @@ from accounts.views import TechnicianOnlyView
 urlpatterns=[
     path('signup/', CustomerSignUpView.as_view()),
     path('dashboard/', TechnicianOnlyView.as_view(), name='Technician-dashboard'),
-    path('homeTechnician/', homeTechnicianView.as_view(), name='Technician-home'),
+    path('hometechnician/', homeTechnicianView.as_view(), name='Technician-home'),
 
 ]

@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission,IsAdminUser
 
 class IsCustomerUser(BasePermission):
     def has_permission(self, request, view):

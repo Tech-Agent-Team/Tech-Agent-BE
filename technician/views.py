@@ -1,10 +1,10 @@
-from rest_framework import generics
+from rest_framework import generics ,permissions
 from rest_framework.response import Response
 from .serializers import TechnicianProfileSignUpSerializer,homeTechnicianSerializers
 from accounts.serializers import CustomUserSerializer
 from orders.models import Order
 from rest_framework.generics import ListAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveUpdateDestroyAPIView
-
+from accounts.permissions import IsTechnicianUser
 # from rest_framework.authtoken.models import Token
 # Create your views here.
 
@@ -23,5 +23,6 @@ class CustomerSignUpView(generics.GenericAPIView):
         )
     
 class homeTechnicianView(ListCreateAPIView):
+    permission_classes=[permissions.IsAuthenticated&IsTechnicianUser]
     queryset= Order.objects.all()
     serializer_class=homeTechnicianSerializers
