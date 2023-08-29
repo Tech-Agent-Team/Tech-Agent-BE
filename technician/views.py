@@ -29,7 +29,8 @@ class TechnicianSignUpView(generics.GenericAPIView):
     
 class homeTechnicianView(ListAPIView):
     permission_classes=[permissions.IsAuthenticated&IsTechnicianUser]
-    queryset= Order.objects.all()
+    queryset = Order.objects.filter(state_show=True)
+
     serializer_class=homeTechnicianSerializers
 
     def retrieve(self, request, *args, **kwargs):
