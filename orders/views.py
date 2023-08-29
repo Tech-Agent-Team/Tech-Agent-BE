@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .serializers import OrderSerializer ,TechnicianProfileSerializer,UpdateOrderSerializer
-from .models import Order
+from .serializers import OrderSerializer ,TechnicianProfileSerializer,CommentSerializer
+from .models import Order,Comment
 from rest_framework.generics import ListAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveUpdateDestroyAPIView
 
 
@@ -75,4 +75,70 @@ class UpdateOrderView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-   
+
+
+
+class CreateCommentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, order_id, *args, **kwargs):
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+        sender = "customer" if request.user.is_customer else  "technician"
+        # Check if the user is either the owner/customer or the current technician
+        if sender== "customer":
+            if order.owner == request.user.customerprofile :
+                serializer = CommentSerializer(data=request.data , partial=True )
+                if serializer.is_valid():
+                    serializer.save(post=order, name=request.user.username ,sender=sender)  # Set the name to the username of the commenter
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"detail": "You are not authorized to comment on this order."}, status=status.HTTP_403_FORBIDDEN)
+        if sender== "technician":
+            if (order.current_technician and order.current_technician.user == request.user):
+                serializer = CommentSerializer(data=request.data , partial=True )
+                if serializer.is_valid():
+                    serializer.save(post=order, name=request.user.username ,sender=sender)  # Set the name to the username of the commenter
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"detail": "You are not authorized to comment on this order."}, status=status.HTTP_403_FORBIDDEN)
+
+
+class CommentListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, order_id, *args, **kwargs):
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check if the user is either the owner/customer or the current technician
+        if order.owner == request.user.customerprofile or (order.current_technician and order.current_technician.user == request.user):
+            comments = Comment.objects.filter(post=order)
+            serializer = CommentSerializer(comments, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "You are not authorized to access this order's comments."}, status=status.HTTP_403_FORBIDDEN)
+
+
+
+
+
+
+
+
+
+# class CommentDetailView(APIView):
+#     def get(self, request, comment_id, *args, **kwargs):
+#         try:
+#             comment = Comment.objects.get(id=comment_id)
+#         except Comment.DoesNotExist:
+#             return Response({"detail": "Comment not found."}, status=status.HTTP_404_NOT_FOUND)
+
+#         serializer = CommentSerializer(comment)
+#         return Response(serializer.data, status=status.HTTP_200_OK)

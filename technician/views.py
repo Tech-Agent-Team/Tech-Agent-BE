@@ -37,8 +37,8 @@ class homeTechnicianView(ListAPIView):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-class TechnicianAcceptedOrdersView(ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]  # Use only IsAuthenticated permission
+class TechnicianAcceptedOrdersView(ListAPIView ):
+    permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]  # Use only IsAuthenticated permission
 
     serializer_class = homeTechnicianSerializers
     
@@ -59,7 +59,7 @@ class TechnicianAcceptedOrdersView(ListAPIView):
         return Response(serializer.data)
 
 class TechnicianCancelOrdersView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated  & IsTechnicianUser]
     
     def put(self, request, order_id, *args, **kwargs):
         try:
