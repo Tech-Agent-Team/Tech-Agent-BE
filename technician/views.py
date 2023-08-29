@@ -8,7 +8,7 @@ from accounts.permissions import IsTechnicianUser
 # from rest_framework.authtoken.models import Token
 # Create your views here.
 
-class CustomerSignUpView(generics.GenericAPIView):
+class TechnicianSignUpView(generics.GenericAPIView):
     serializer_class = TechnicianProfileSignUpSerializer
     def post(self,request,*args, **kwargs):
         serializer= self.get_serializer(data = request.data)
@@ -17,12 +17,11 @@ class CustomerSignUpView(generics.GenericAPIView):
         return Response(
             {
                 "user": CustomUserSerializer(user, context = self.get_serializer_context()).data,
-                # "token": Token.objects.get(user = user).key,
                 "message":"account created successfully"
             }
         )
     
-class homeTechnicianView(ListCreateAPIView):
+class homeTechnicianView(ListAPIView):
     permission_classes=[permissions.IsAuthenticated&IsTechnicianUser]
     queryset= Order.objects.all()
     serializer_class=homeTechnicianSerializers
