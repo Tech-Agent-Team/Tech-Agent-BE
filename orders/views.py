@@ -116,16 +116,24 @@ class CommentListView(APIView):
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
             return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+        check = "customer" if request.user.is_customer else  "technician"
 
         # Check if the user is either the owner/customer or the current technician
-        if order.owner == request.user.customerprofile or (order.current_technician and order.current_technician.user == request.user):
-            comments = Comment.objects.filter(post=order)
-            serializer = CommentSerializer(comments, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"detail": "You are not authorized to access this order's comments."}, status=status.HTTP_403_FORBIDDEN)
+        if check == "customer":
+            if order.owner == request.user.customerprofile :
+                comments = Comment.objects.filter(post=order)
+                serializer = CommentSerializer(comments, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"detail": "You are not authorized to access this order's comments."}, status=status.HTTP_403_FORBIDDEN)
 
-
+        if check == "technician":
+            if ( order.current_technician.user == request.user):
+                comments = Comment.objects.filter(post=order)
+                serializer = CommentSerializer(comments, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"detail": "You are not authorized to access this order's comments."}, status=status.HTTP_403_FORBIDDEN)
 
 
 
