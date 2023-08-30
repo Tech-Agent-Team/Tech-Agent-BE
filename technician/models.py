@@ -7,7 +7,6 @@ class TechnicianProfile(models.Model):
     
     profession = models.CharField(max_length=255)
     rating = models.IntegerField(default=0)
-    feedback = models.TextField()
     image = models.ImageField(upload_to='uploads/', blank=True,null=True)
     description = models.TextField()
 

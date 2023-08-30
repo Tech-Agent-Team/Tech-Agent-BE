@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import CustomerProfile
 from accounts.models import CustomUser
+from django.contrib.auth import get_user_model
 from orders.models import Order
 
 class CustomerProfileSignUpSerializer(serializers.ModelSerializer):
@@ -12,6 +13,12 @@ class CustomerProfileSignUpSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
         
+    def validate_email(self, value):
+        user_model = get_user_model()
+        if user_model.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email address is already registered.")
+        return value
+    
     def save(self, **kwargs):
         user = CustomUser(
             username = self.validated_data['username'],
