@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from .models import CustomerProfile
 from accounts.models import CustomUser
-from orders.models import Order
+from orders.models import Order,Comment
 
 class CustomerProfileSignUpSerializer(serializers.ModelSerializer):
     password2=serializers.CharField(style={"input_type": "password"},write_only=True)
@@ -29,13 +29,19 @@ class CustomerProfileSignUpSerializer(serializers.ModelSerializer):
         CustomerProfile.objects.create(user = user)
         return user
     
+
 class CustomUserSerializerInfo(serializers.ModelSerializer):
     class Meta:
         model = CustomUser  # Replace with your actual CustomUser model
         fields = ['username']  # Add the relevant fields
-
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+        
 class CustomermyordersSerializers(serializers.ModelSerializer):
-    technician_name = CustomUserSerializerInfo(source='current_technician.user', read_only=True)  # Assuming 'owner' is the ForeignKey to CustomerProfile
+    technician_name = CustomUserSerializerInfo(source='current_technician.user', read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order

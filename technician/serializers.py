@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import TechnicianProfile
-from orders.models import Order
+from orders.models import Order ,Comment
 from accounts.models import CustomUser
 from django.contrib.auth import get_user_model
 from accounts.serializers import CustomUserSerializer,CustomUserWithNoPassword
@@ -55,12 +55,20 @@ class CustomUserSerializerInfo(serializers.ModelSerializer):
         model = CustomUser  # Replace with your actual CustomUser model
         fields = ['username']  # Add the relevant fields
           
-class TechnicianAcceptedOrdersSerializers(serializers.ModelSerializer):
-    customer_name = CustomUserSerializerInfo(source='owner.user', read_only=True)  # Assuming 'owner' is the ForeignKey to CustomerProfile
+class CommentSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Order
-        fields=['id','description','image','technician_type','eta_arrival_time','customer_name']
-   
+        model = Comment
+        fields = '__all__'
+
+class TechnicianAcceptedOrdersSerializers(serializers.ModelSerializer):
+    customer_name = CustomUserSerializerInfo(source='owner.user', read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)  # Add this line for comments
+
+    class Meta:
+        model = Order
+        fields = ['id', 'description', 'image', 'technician_type', 'eta_arrival_time', 'customer_name', 'comments']
+
+
 class TechnicianProfileSerializer(serializers.ModelSerializer):
     user = CustomUserWithNoPassword()
     average_rating = serializers.FloatField()
