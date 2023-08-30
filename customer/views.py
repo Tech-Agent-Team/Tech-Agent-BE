@@ -1,6 +1,6 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from .serializers import CustomerProfileSignUpSerializer ,CustomermyordersSerializers 
+from .serializers import CustomerProfileSignUpSerializer ,CustomermyordersSerializers,CustomerordersfeedSerializers
 from accounts.serializers import CustomUserSerializer
 from rest_framework.generics import ListAPIView
 from rest_framework import generics ,permissions
@@ -9,7 +9,6 @@ from orders.models import Order
 from .models import CustomerProfile
 from django.db.models import Q
 from rest_framework import status
-
 
 
 
@@ -97,3 +96,29 @@ class Customerordersdone(ListAPIView):
 
 
 
+class Customerordersfeed(ListAPIView):
+    permission_classes = [permissions.IsAuthenticated & IsCustomerUser]
+
+    def put(self, request, order_id, *args, **kwargs):
+        try:
+            order = Order.objects.get(pk=order_id)
+        except Order.DoesNotExist:
+            return Response(status=404)  # Order not found
+
+        # Check if the current user is the owner of the order
+        if order.owner != request.user.customerprofile:
+            return Response({"detail": "Forbidden."}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)  # Forbidden
+        if order.state_is_ongoing==True:
+            return Response({"detail": "Order is state_is_ongoing"}, status=status.HTTP_400_BAD_REQUEST)
+        if order.state_show ==True:
+            return Response({"detail": "Order is not accepted yet by technician **state_show"}, status=status.HTTP_400_BAD_REQUEST)
+        # order.state_is_ongoing=False
+        # order.state_show=False
+        serializer = CustomerordersfeedSerializers(data=request.data ,partial=True)
+        if serializer.is_valid():
+            feedback = serializer.validated_data.get('feedback')
+            if feedback:
+                order.feedback = feedback
+            order.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
