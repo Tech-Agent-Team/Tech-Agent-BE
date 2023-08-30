@@ -28,6 +28,7 @@ from technician.models import TechnicianProfile
 
 class Order(models.Model):
     feedback = models.TextField()
+    rating = models.IntegerField(null=True,blank=True)
     state_is_ongoing = models.BooleanField(default=False)
     state_show = models.BooleanField(default=True)
     eta_arrival_time = models.DateTimeField(null=True,blank=True)

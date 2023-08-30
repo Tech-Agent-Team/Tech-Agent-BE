@@ -8,7 +8,6 @@ from django.dispatch import receiver
 
 
 class CustomUser(AbstractUser):
-    email = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     is_customer = models.BooleanField(default=False)

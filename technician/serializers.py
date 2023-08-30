@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import TechnicianProfile
 from orders.models import Order
 from accounts.models import CustomUser
+from django.contrib.auth import get_user_model
 
 class TechnicianProfileSignUpSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
@@ -15,7 +16,13 @@ class TechnicianProfileSignUpSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
-
+        
+    def validate_email(self, value):
+        user_model = get_user_model()
+        if user_model.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email address is already registered.")
+        return value
+    
     def save(self, **kwargs):
         user = CustomUser(
             username=self.validated_data['username'],
@@ -37,24 +44,7 @@ class TechnicianProfileSignUpSerializer(serializers.ModelSerializer):
         )
         return user
     
-
-
-
 class homeTechnicianSerializers(serializers.ModelSerializer):
     class Meta:
         model=Order
         fields=['id','description','image','technician_type','eta_arrival_time']
-
-
-
-
-        
-# {
-#   "username":"bayan",
-#   "email":"bayan@gmail.com",
-#   "password":"1234",
-#   "password2":"1234",
-#   "profession":"eng",
-#   "image":"dd",
-#   "description":"lolo"
-# }
