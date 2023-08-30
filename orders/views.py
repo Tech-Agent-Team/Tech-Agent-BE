@@ -6,6 +6,28 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import OrderSerializer ,TechnicianProfileSerializer,UpdateOrderSerializer
 from .models import Order
 from rest_framework.generics import ListAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveUpdateDestroyAPIView
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Order  # Import your Order model
+from .serializers import OrderSerializer  # Import your Order serializer
+
+@api_view(['POST'])
+def create_order(request):
+    if request.method == 'POST':
+        serializer = OrderSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Order created successfully'})
+        else:
+            return Response(serializer.errors, status=400)
+
+    return Response({'message': 'Invalid request method'})
+
+
+
+
+
 
 
 class CreateOrderView(APIView):
