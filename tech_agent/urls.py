@@ -20,7 +20,6 @@ from orders.views import CreateOrderView,UpdateOrderView
 from rest_framework_simplejwt.views import (TokenRefreshView)
 from django.contrib import admin
 from django.urls import path,include
-from accounts.views import  TechnicianOnlyView,CustomerOnlyView
 from orders.views import OrderAcceptanceView
 from django.conf.urls.static import static
 from django.conf import settings

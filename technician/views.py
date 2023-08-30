@@ -1,6 +1,6 @@
 from rest_framework import generics ,permissions
 from rest_framework.response import Response
-from .serializers import TechnicianProfileSignUpSerializer,homeTechnicianSerializers
+from .serializers import TechnicianProfileSignUpSerializer,homeTechnicianSerializers,TechnicianProfileSerializer,TechnicianAcceptedOrdersSerializers
 from accounts.serializers import CustomUserSerializer
 from orders.models import Order
 from rest_framework.generics import ListAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveUpdateDestroyAPIView,DestroyAPIView
@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from orders.serializers import OrderSerializer
 from rest_framework.views import APIView
+from django.http import Http404
 
 # from rest_framework.authtoken.models import Token
 # Create your views here.
@@ -41,7 +42,7 @@ class homeTechnicianView(ListAPIView):
 class TechnicianAcceptedOrdersView(ListAPIView ):
     permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]  # Use only IsAuthenticated permission
 
-    serializer_class = homeTechnicianSerializers
+    serializer_class = TechnicianAcceptedOrdersSerializers
     
     def get_queryset(self):
         current_user = self.request.user  # Assuming the identifier is the username
@@ -79,3 +80,36 @@ class TechnicianCancelOrdersView(APIView):
         order.save()
 
         return Response({"detail": "Order cancelled successfully."}, status=status.HTTP_200_OK)
+
+class TechnicianProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = TechnicianProfileSerializer
+    
+    def get_object(self):
+        try :
+            user_name = self.kwargs['user_name']
+            
+            technician_profile = TechnicianProfile.objects.get(user__username=user_name)
+            
+            average_rating = Order.objects.filter(current_technician=technician_profile).values_list('rating', flat=True)
+            feedback_list = Order.objects.filter(current_technician=technician_profile).values_list('feedback', flat=True)
+
+            num = 0
+            sum_rating = 0
+            
+            for rating in average_rating:
+                if rating != None:
+                    num += 1
+                    sum_rating += float(rating)
+            
+            avg_rating = sum_rating / num
+            
+            technician_profile.average_rating = round(avg_rating,1)
+            
+            print(technician_profile.average_rating)
+            technician_profile.feedback_list = list(feedback_list)
+
+            return technician_profile
+        except TechnicianProfile.DoesNotExist:
+            raise Http404("Technician does not Exist")
+            

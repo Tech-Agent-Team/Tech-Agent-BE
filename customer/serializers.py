@@ -1,46 +1,3 @@
-# from rest_framework import serializers
-# from .models import CustomerProfile
-# from accounts.models import CustomUser
-# from django.contrib.auth import get_user_model
-# from orders.models import Order
-
-# class CustomerProfileSignUpSerializer(serializers.ModelSerializer):
-#     password2=serializers.CharField(style={"input_type": "password"},write_only=True)
-#     class Meta:
-#         model= CustomUser
-#         fields = ['username','email', 'password', 'password2']
-#         extra_kwargs={
-#             'password': {'write_only': True}
-#         }
-        
-#     def validate_email(self, value):
-#         user_model = get_user_model()
-#         if user_model.objects.filter(email=value).exists():
-#             raise serializers.ValidationError("This email address is already registered.")
-#         return value
-    
-#     def save(self, **kwargs):
-#         user = CustomUser(
-#             username = self.validated_data['username'],
-#             email=self.validated_data['email'],
-#         )
-#         password = self.validated_data['password']
-#         password2 = self.validated_data['password2']
-#         if password != password2:
-#             raise serializers.ValidationError({"error":"The passwords do not match"})
-#         user.set_password(password)
-#         user.is_customer = True
-
-#         user.save()
-#         CustomerProfile.objects.create(user = user)
-#         return user
-    
-
-# class CustomermyordersSerializers(serializers.ModelSerializer):
-#     class Meta:
-#         model=Order
-#         fields = '__all__'
-
 
 from rest_framework import serializers
 from .models import CustomerProfile
@@ -72,14 +29,35 @@ class CustomerProfileSignUpSerializer(serializers.ModelSerializer):
         CustomerProfile.objects.create(user = user)
         return user
     
+class CustomUserSerializerInfo(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser  # Replace with your actual CustomUser model
+        fields = ['username']  # Add the relevant fields
 
 class CustomermyordersSerializers(serializers.ModelSerializer):
-    class Meta:
-        model=Order
-        fields = '__all__'
+    technician_name = CustomUserSerializerInfo(source='current_technician.user', read_only=True)  # Assuming 'owner' is the ForeignKey to CustomerProfile
 
+    class Meta:
+        model = Order
+        fields = '__all__'
 
 class CustomerordersfeedSerializers(serializers.ModelSerializer):
     class Meta:
         model=Order
-        fields =('feedback',)
+        fields =('feedback','rating')
+
+class CustomerProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    email = serializers.EmailField(source='user.email')
+    phone = serializers.CharField(source='user.phone')
+    location = serializers.CharField(source='user.location')
+    is_customer = serializers.BooleanField(source='user.is_customer')
+    num_orders = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomerProfile
+        fields = ['username', 'email', 'phone', 'location', 'is_customer', 'num_orders']
+    
+    def get_num_orders(self, instance):
+
+        return instance.order_set.count()

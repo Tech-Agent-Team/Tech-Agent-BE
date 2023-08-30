@@ -3,6 +3,7 @@ from .models import TechnicianProfile
 from orders.models import Order
 from accounts.models import CustomUser
 from django.contrib.auth import get_user_model
+from accounts.serializers import CustomUserSerializer,CustomUserWithNoPassword
 
 class TechnicianProfileSignUpSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
@@ -48,3 +49,23 @@ class homeTechnicianSerializers(serializers.ModelSerializer):
     class Meta:
         model=Order
         fields=['id','description','image','technician_type','eta_arrival_time']
+         
+class CustomUserSerializerInfo(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser  # Replace with your actual CustomUser model
+        fields = ['username']  # Add the relevant fields
+          
+class TechnicianAcceptedOrdersSerializers(serializers.ModelSerializer):
+    customer_name = CustomUserSerializerInfo(source='owner.user', read_only=True)  # Assuming 'owner' is the ForeignKey to CustomerProfile
+    class Meta:
+        model=Order
+        fields=['id','description','image','technician_type','eta_arrival_time','customer_name']
+   
+class TechnicianProfileSerializer(serializers.ModelSerializer):
+    user = CustomUserWithNoPassword()
+    average_rating = serializers.FloatField()
+    feedback_list = serializers.ListField()
+    
+    class Meta:
+        model = TechnicianProfile
+        fields = ['user', 'profession','image', 'description', 'average_rating','feedback_list']
