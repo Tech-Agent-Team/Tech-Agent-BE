@@ -1,6 +1,6 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from .serializers import CustomerProfileSignUpSerializer ,CustomermyordersSerializers,CustomerordersfeedSerializers
+from .serializers import CustomerProfileSignUpSerializer,CustomerProfileSerializer ,CustomermyordersSerializers,CustomerordersfeedSerializers
 from accounts.serializers import CustomUserSerializer
 from rest_framework.generics import ListAPIView
 from rest_framework import generics ,permissions
@@ -37,12 +37,14 @@ class Customermyorders(ListAPIView):
 
     def get_queryset(self):
         current_user = self.request.user
+
         try:
             customer_profile = CustomerProfile.objects.get(user=current_user)
             queryset = Order.objects.filter(
                 Q(owner=customer_profile) &
                 (Q(state_is_ongoing=True) | Q(state_show=True))
             )
+
             return queryset
         except CustomerProfile.DoesNotExist:
             return Order.objects.none()
@@ -51,7 +53,6 @@ class Customermyorders(ListAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
-    
 
 
 class Customerdeletorders(ListAPIView):
@@ -119,6 +120,33 @@ class Customerordersfeed(ListAPIView):
             feedback = serializer.validated_data.get('feedback')
             if feedback:
                 order.feedback = feedback
+
+            rating = serializer.validated_data.get('rating')
+            if rating:
+                order.rating = rating
             order.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from .models import CustomerProfile
+from .serializers import CustomerProfileSerializer
+from django.core.exceptions import ObjectDoesNotExist
+
+from django.http import Http404
+
+class CustomerProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated ]
+    serializer_class = CustomerProfileSerializer
+
+    def get_object(self):
+        user_name = self.kwargs['user_name']
+        try:
+            customer_profile = CustomerProfile.objects.get(user__username=user_name)
+            num_orders = Order.objects.filter(owner=customer_profile).values_list('created_at', flat=True)
+            customer_profile.num_orders = len(num_orders)
+            return customer_profile
+        except CustomerProfile.DoesNotExist:
+            raise Http404("Customer profile does not exist")
