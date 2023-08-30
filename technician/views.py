@@ -39,19 +39,17 @@ class homeTechnicianView(ListAPIView):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-class TechnicianAcceptedOrdersView(ListAPIView ):
-    permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]  # Use only IsAuthenticated permission
-
+class TechnicianAcceptedOrdersView(ListAPIView):
+    permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]
     serializer_class = TechnicianAcceptedOrdersSerializers
     
     def get_queryset(self):
-        current_user = self.request.user  # Assuming the identifier is the username
+        current_user = self.request.user
+
         try:
             technician = TechnicianProfile.objects.get(user=current_user)
-            
             queryset = Order.objects.filter(current_technician=technician, state_is_ongoing=True)
             return queryset
-    
         except TechnicianProfile.DoesNotExist:
             return Order.objects.none()
             
