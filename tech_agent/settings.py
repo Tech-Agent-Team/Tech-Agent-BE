@@ -195,4 +195,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_WHITELIST = tuple(env.list("ALLOWED_ORIGINS"))
 CORS_ALLOW_ALL_ORIGINS = env.bool("ALLOW_ALL_ORIGINS")
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = [
+    BASE_DIR / 'staticfiles'
+]
+STATICFILES_DIR = [
+    BASE_DIR / 'staticfiles'
+]
