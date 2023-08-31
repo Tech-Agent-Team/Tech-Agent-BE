@@ -1,19 +1,16 @@
 from rest_framework import generics ,permissions
 from rest_framework.response import Response
 from .serializers import TechnicianProfileSignUpSerializer,homeTechnicianSerializers,TechnicianProfileSerializer,TechnicianAcceptedOrdersSerializers
-from accounts.serializers import   CustomUserSerializer , CustomUserUpdateProfileCustomerSerializer
+from accounts.serializers import CustomUserSerializer
 from orders.models import Order
 from rest_framework.generics import ListAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveUpdateDestroyAPIView,DestroyAPIView
 from accounts.permissions import IsTechnicianUser
 from .models import TechnicianProfile
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from orders.serializers import OrderSerializer
 from rest_framework.views import APIView
 from django.http import Http404
-
-# from rest_framework.authtoken.models import Token
-# Create your views here.
+from .serializers import TechnicianUpdateProfileSerializer
 
 class TechnicianSignUpView(generics.GenericAPIView):
     serializer_class = TechnicianProfileSignUpSerializer
@@ -102,8 +99,7 @@ class TechnicianProfileView(generics.RetrieveUpdateAPIView):
             if num :
                 avg_rating = sum_rating / num
             else:
-                
-                avg_rating = 5
+                avg_rating = 10
             
             technician_profile.average_rating = round(avg_rating,1)
             
@@ -115,4 +111,55 @@ class TechnicianProfileView(generics.RetrieveUpdateAPIView):
             raise Http404("Technician does not Exist")
 
 
+class TechnicianInfoUpdateProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]
+    serializer_class = TechnicianUpdateProfileSerializer
 
+    def get_object(self):
+        return self.request.user
+
+    def put(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = TechnicianUpdateProfileSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class TechnicianInfoUpdateProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]
+    serializer_class = TechnicianUpdateProfileSerializer
+
+    def get_object(self):
+        return self.request.user 
+
+    def put(self, request, *args, **kwargs):
+        user = self.get_object()
+        
+        serializer = TechnicianUpdateProfileSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class TechnicianInfoUpdateProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]
+    serializer_class = TechnicianUpdateProfileSerializer
+
+    def get_object(self):
+        return self.request.user.technicianprofile
+
+    def put(self, request, *args, **kwargs):
+        technician_profile = self.get_object()
+
+        serializer = TechnicianUpdateProfileSerializer(technician_profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

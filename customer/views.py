@@ -9,7 +9,7 @@ from django.db.models import Q
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from django.http import Http404
-from accounts.serializers import CustomUserUpdateProfileCustomerSerializer
+from accounts.serializers import CustomUserUpdateProfileSerializer
 class CustomerSignUpView(generics.GenericAPIView):
     serializer_class = CustomerProfileSignUpSerializer
 

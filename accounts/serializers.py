@@ -14,7 +14,7 @@ class CustomUserWithNoPassword(serializers.ModelSerializer):
 
 
 
-class CustomUserUpdateProfileCustomerSerializer(serializers.ModelSerializer):
+class CustomUserUpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['email', 'phone', 'location']

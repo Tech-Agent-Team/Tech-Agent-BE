@@ -1,7 +1,7 @@
 from django.http import request
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from .serializers import CustomUserSerializer,CustomUserUpdateProfileCustomerSerializer
+from .serializers import CustomUserSerializer,CustomUserUpdateProfileSerializer
 from .permissions import IsCustomerUser, IsTechnicianUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -40,14 +40,14 @@ class TechnicianOnlyView(generics.RetrieveAPIView):
 
 class CustomUserUpdateProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = CustomUserUpdateProfileCustomerSerializer
+    serializer_class = CustomUserUpdateProfileSerializer
 
     def get_object(self):
         return self.request.user  # Return the authenticated user
 
     def put(self, request, *args, **kwargs):
         user = self.get_object()
-        serializer = CustomUserUpdateProfileCustomerSerializer(user, data=request.data, partial=True)
+        serializer = CustomUserUpdateProfileSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
