@@ -25,7 +25,7 @@
 from django.db import models
 from customer.models import CustomerProfile
 from technician.models import TechnicianProfile
-
+from cloudinary.models import CloudinaryField
 class Order(models.Model):
     feedback = models.TextField()
     rating = models.IntegerField(default=10)
@@ -34,7 +34,7 @@ class Order(models.Model):
     eta_arrival_time = models.DateTimeField(null=True, blank=True)
     description = models.TextField()
     technician_type = models.CharField(max_length=255)
-    image =models.ImageField(upload_to='uploads/', blank=True,null=True)
+    image = CloudinaryField('image',overwrite=True,format="jpg",null=True)
     address = models.CharField(max_length=255)
     owner = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE)
     current_technician = models.ForeignKey(TechnicianProfile, on_delete=models.CASCADE, null=True, blank=True)
