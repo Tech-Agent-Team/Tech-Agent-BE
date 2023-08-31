@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    networks:
+      - my_custom_network
+    ports:
+      - "8000:8000"
+    depends_on: 
+      - db
+
+  db:
+    image: postgres:12  # Use PostgreSQL 12 image
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - my_custom_network
+
+networks:
+  my_custom_network:
+    driver: bridge
