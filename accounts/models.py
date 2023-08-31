@@ -8,8 +8,8 @@ from django.dispatch import receiver
 
 
 class CustomUser(AbstractUser):
-    phone = models.CharField(max_length=255)
-    location = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255,null=True, blank=True)
+    location = models.CharField(max_length=255,null=True, blank=True)
     is_customer = models.BooleanField(default=False)
     is_technician = models.BooleanField(default=False)
     

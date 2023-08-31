@@ -62,7 +62,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class TechnicianAcceptedOrdersSerializers(serializers.ModelSerializer):
     customer_name = CustomUserSerializerInfo(source='owner.user', read_only=True)
-    comments = CommentSerializer(many=True, read_only=True)  # Add this line for comments
+    comments = CommentSerializer(many=True, read_only=True, default=[{'text': 'Default Comment'}])
 
     class Meta:
         model = Order

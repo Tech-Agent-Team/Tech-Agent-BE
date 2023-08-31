@@ -1,7 +1,7 @@
 from rest_framework import generics ,permissions
 from rest_framework.response import Response
 from .serializers import TechnicianProfileSignUpSerializer,homeTechnicianSerializers,TechnicianProfileSerializer,TechnicianAcceptedOrdersSerializers
-from accounts.serializers import CustomUserSerializer
+from accounts.serializers import   CustomUserSerializer , CustomUserUpdateProfileCustomerSerializer
 from orders.models import Order
 from rest_framework.generics import ListAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveUpdateDestroyAPIView,DestroyAPIView
 from accounts.permissions import IsTechnicianUser
@@ -110,4 +110,6 @@ class TechnicianProfileView(generics.RetrieveUpdateAPIView):
             return technician_profile
         except TechnicianProfile.DoesNotExist:
             raise Http404("Technician does not Exist")
-            
+
+
+

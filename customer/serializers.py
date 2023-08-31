@@ -66,4 +66,10 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
     
     def get_num_orders(self, instance):
 
-        return instance.order_set.count()
+        return instance.order_set.count()  # Adjust this to match your actual relationship name
+
+
+    class CustomUserUpdateProfileSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = CustomUser
+            fields = ['email', 'phone', 'location', 'password']
