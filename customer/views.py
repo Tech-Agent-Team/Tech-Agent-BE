@@ -134,17 +134,3 @@ class CustomerProfileView(generics.RetrieveUpdateAPIView):
              raise Http404("Customer profile does not exist")
 
 
-class CustomerUpdateProfileView(generics.RetrieveUpdateAPIView):
-    permission_classes = [permissions.IsAuthenticated & IsCustomerUser]
-    serializer_class = CustomUserUpdateProfileCustomerSerializer
-
-    def get_object(self):
-        return self.request.user  # Return the authenticated user
-
-    def put(self, request, *args, **kwargs):
-        user = self.get_object()
-        serializer = CustomUserUpdateProfileCustomerSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

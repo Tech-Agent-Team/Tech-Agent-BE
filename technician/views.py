@@ -99,8 +99,11 @@ class TechnicianProfileView(generics.RetrieveUpdateAPIView):
                 if rating != None:
                     num += 1
                     sum_rating += float(rating)
-            
-            avg_rating = sum_rating / num
+            if num :
+                avg_rating = sum_rating / num
+            else:
+                
+                avg_rating = 5
             
             technician_profile.average_rating = round(avg_rating,1)
             
