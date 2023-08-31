@@ -2,6 +2,7 @@ from rest_framework import generics ,permissions
 from rest_framework.response import Response
 from .serializers import TechnicianProfileSignUpSerializer,homeTechnicianSerializers,TechnicianProfileSerializer,TechnicianAcceptedOrdersSerializers
 from accounts.serializers import CustomUserSerializer
+#from accounts.serializers import CustomUserUpdateProfileTechnicianSerializer
 from orders.models import Order
 from rest_framework.generics import ListAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveUpdateDestroyAPIView,DestroyAPIView
 from accounts.permissions import IsTechnicianUser
@@ -113,3 +114,27 @@ class TechnicianProfileView(generics.RetrieveUpdateAPIView):
         except TechnicianProfile.DoesNotExist:
             raise Http404("Technician does not Exist")
             
+# class TechnicianUpdateProfileView(generics.RetrieveUpdateAPIView):
+#     permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]
+#     serializer_class = CustomUserUpdateProfileTechnicianSerializer
+
+#     def get_object(self):
+#         return self.request.user
+    
+#     def update_technician_profile(self, user, technician_data):
+#         technician_profile = user.technicianprofile
+#         for key, value in technician_data.items():
+#             setattr(technician_profile, key, value)
+#         technician_profile.save()
+
+#     def put(self, request, *args, **kwargs):
+#         user = self.get_object()
+#         serializer = CustomUserUpdateProfileTechnicianSerializer(user, data=request.data, partial=True)
+#         if serializer.is_valid():
+#             technician_data = serializer.validated_data.pop('technicianprofile', {})
+#             serializer.save()
+#             if technician_data:
+#                 self.update_technician_profile(user, technician_data)
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
