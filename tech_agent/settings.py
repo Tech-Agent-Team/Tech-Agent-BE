@@ -12,7 +12,14 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import cloudinary
+import os
 
+# print(os.environ.get('CLOUD_NAME'),os.environ.get('CLOUD_APIKEY'),os.environ.get('CLOUD_API_SECRET'))
+
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUD_NAME'),api_key=os.environ.get('CLOUD_APIKEY'),api_secret=os.environ.get('CLOUD_API_SECRET')
+)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
