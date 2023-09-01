@@ -77,3 +77,9 @@ class TechnicianProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = TechnicianProfile
         fields = ['user', 'profession','image', 'description', 'average_rating','feedback_list']
+
+
+class TechnicianUpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TechnicianProfile
+        fields = ['profession','image', 'description']
