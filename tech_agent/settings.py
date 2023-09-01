@@ -47,7 +47,7 @@ environ.Env.read_env()
 ENVIRONMENT = env.str("ENVIRONMENT")
 
 cloudinary.config(
-    cloud_name=env.str('CLOUD_NAME'),api_key=env.str('CLOUD_APIKEY'),api_secret=env.str('CLOUD_API_SECRET')
+    cloud_name=env.str('CLOUD_NAME'),api_key=env.str('CLOUD_APIKEY'),api_secret=env.str('CLOUD_API_SECRET'), secure = False
 )
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
