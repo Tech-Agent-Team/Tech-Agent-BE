@@ -1,7 +1,7 @@
 from django.http import request
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from .serializers import CustomUserSerializer
+from .serializers import CustomUserSerializer,CustomUserUpdateProfileSerializer
 from .permissions import IsCustomerUser, IsTechnicianUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -37,3 +37,20 @@ class TechnicianOnlyView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+
+class CustomUserUpdateProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CustomUserUpdateProfileSerializer
+
+    def get_object(self):
+        return self.request.user  # Return the authenticated user
+
+    def put(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = CustomUserUpdateProfileSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
