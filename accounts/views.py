@@ -24,6 +24,8 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
+
+
 class CustomerOnlyView(generics.RetrieveAPIView):
     permission_classes=[permissions.IsAuthenticated&IsCustomerUser]
     serializer_class=CustomUserSerializer
