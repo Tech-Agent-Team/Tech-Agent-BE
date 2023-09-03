@@ -5,7 +5,7 @@ from accounts.serializers import CustomUserSerializer
 from orders.models import Order
 from rest_framework.generics import ListAPIView, RetrieveAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveUpdateDestroyAPIView,DestroyAPIView
 from accounts.permissions import IsTechnicianUser
-from .models import TechnicianProfile
+from .models import TechnicianProfile , Profession
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.views import APIView
@@ -27,11 +27,22 @@ class TechnicianSignUpView(generics.GenericAPIView):
         )
     
 class homeTechnicianView(ListAPIView):
-    permission_classes=[permissions.IsAuthenticated&IsTechnicianUser]
-    queryset = Order.objects.filter(state_show=True)
+    permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]
+    serializer_class = homeTechnicianSerializers
 
-    serializer_class=homeTechnicianSerializers
-
+    def get_queryset(self):
+        current_user = self.request.user
+        try:
+            technician = TechnicianProfile.objects.get(user=current_user)
+            professions = Profession.objects.filter(technicianProfession=technician)
+            profession_names = [profession.techProfession for profession in professions]
+            
+            # Filter orders by state_show=True and technician_type in profession_names
+            queryset = Order.objects.filter(state_show=True, technician_type__in=profession_names)
+            return queryset
+        except TechnicianProfile.DoesNotExist:
+            return Order.objects.none()
+            
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -112,44 +123,6 @@ class TechnicianProfileView(generics.RetrieveUpdateAPIView):
         except TechnicianProfile.DoesNotExist:
             raise Http404("Technician does not Exist")
 
-
-
-class TechnicianInfoUpdateProfileView(generics.RetrieveUpdateAPIView):
-    permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]
-    serializer_class = TechnicianUpdateProfileSerializer
-
-    def get_object(self):
-        return self.request.user
-
-    def put(self, request, *args, **kwargs):
-        user = self.get_object()
-        serializer = TechnicianUpdateProfileSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class TechnicianInfoUpdateProfileView(generics.RetrieveUpdateAPIView):
-    permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]
-    serializer_class = TechnicianUpdateProfileSerializer
-
-    def get_object(self):
-        return self.request.user 
-
-    def put(self, request, *args, **kwargs):
-        user = self.get_object()
-
-        serializer = TechnicianUpdateProfileSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
 class TechnicianInfoUpdateProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated & IsTechnicianUser]
     serializer_class = TechnicianUpdateProfileSerializer
@@ -163,6 +136,6 @@ class TechnicianInfoUpdateProfileView(generics.RetrieveUpdateAPIView):
         serializer = TechnicianUpdateProfileSerializer(technician_profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

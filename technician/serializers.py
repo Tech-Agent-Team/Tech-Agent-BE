@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import TechnicianProfile
+from .models import TechnicianProfile , Profession
+
 from orders.models import Order ,Comment
 from accounts.models import CustomUser
 from django.contrib.auth import get_user_model
@@ -7,13 +8,13 @@ from accounts.serializers import CustomUserSerializer,CustomUserWithNoPassword
 
 class TechnicianProfileSignUpSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
-    profession = serializers.CharField(max_length=255)
+    professions = serializers.ListField(child=serializers.CharField(max_length=255))
     image = serializers.CharField(max_length=255)
     description = serializers.CharField()
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'password', 'password2', 'profession', 'image', 'description']
+        fields = ['username', 'email', 'password', 'password2', 'image', 'description', 'professions']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -37,14 +38,21 @@ class TechnicianProfileSignUpSerializer(serializers.ModelSerializer):
         user.is_technician = True
         user.save()
 
-        TechnicianProfile.objects.create(
+        technician_profile = TechnicianProfile.objects.create(
             user=user,
-            profession=self.validated_data['profession'],
             image=self.validated_data['image'],
             description=self.validated_data['description']
         )
+
+        professions = self.validated_data.get('professions', [])
+        for profession in professions:
+            Profession.objects.create(
+                technicianProfession=technician_profile,
+                techProfession=profession
+            )
+
         return user
-    
+
 class homeTechnicianSerializers(serializers.ModelSerializer):
     class Meta:
         model=Order
@@ -69,17 +77,39 @@ class TechnicianAcceptedOrdersSerializers(serializers.ModelSerializer):
         fields = ['id', 'description', 'image', 'technician_type', 'eta_arrival_time', 'customer_name', 'comments']
 
 
+
 class TechnicianProfileSerializer(serializers.ModelSerializer):
     user = CustomUserWithNoPassword()
     average_rating = serializers.FloatField()
     feedback_list = serializers.ListField()
-    
+    professions = serializers.StringRelatedField(many=True)  # Assuming 'professions' is a related field in TechnicianProfile
+
     class Meta:
         model = TechnicianProfile
-        fields = ['user', 'profession','image', 'description', 'average_rating','feedback_list']
+        fields = ['user', 'professions', 'image', 'description', 'average_rating', 'feedback_list']
 
 
 class TechnicianUpdateProfileSerializer(serializers.ModelSerializer):
+    professions = serializers.ListField(child=serializers.CharField(max_length=255), required=False)
+
     class Meta:
         model = TechnicianProfile
-        fields = ['profession','image', 'description']
+        fields = ['professions', 'image', 'description']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['professions'] = [profession.techProfession for profession in instance.professions.all()]
+        return data
+
+    def update(self, instance, validated_data):
+        instance.image = validated_data.get('image', instance.image)
+        instance.description = validated_data.get('description', instance.description)
+        
+        professions = validated_data.get('professions', [])
+        if professions is not None:
+            instance.professions.all().delete()
+            for profession in professions:
+                Profession.objects.create(technicianProfession=instance, techProfession=profession)
+        
+        instance.save()
+        return instance
