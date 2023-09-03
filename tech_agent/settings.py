@@ -35,12 +35,15 @@ env = environ.Env(
     CLOUD_APIKEY=(str, ""),
     CLOUD_API_SECRET=(str, ""),
     SECURE=(bool, False),
-
+    
 
 
 )
 cloudinary.config(
-    cloud_name=env.str('CLOUD_NAME'),api_key=env.str('CLOUD_APIKEY'),api_secret=env.str('CLOUD_API_SECRET') ,secure =env.str('SECURE')
+    cloud_name=env.str('CLOUD_NAME'),
+    api_key=env.str('CLOUD_APIKEY'),
+    api_secret=env.str('CLOUD_API_SECRET'),
+    secure =env.str('SECURE')
 )
 environ.Env.read_env()
 
@@ -212,3 +215,11 @@ STATIC_ROOT = [
 STATICFILES_DIR = [
     BASE_DIR / 'staticfiles'
 ]
+
+# Email configuration for Gmail SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail SMTP server
+EMAIL_PORT = 587  # Gmail SMTP port (TLS)
+EMAIL_USE_TLS = True  # Use TLS encryption
+EMAIL_HOST_USER = 'ahmasamer51@gmail.com'  # Your Gmail email address
+EMAIL_HOST_PASSWORD = 'ofqhdqbtnihfuysm' # مشان الله لا تسرقة

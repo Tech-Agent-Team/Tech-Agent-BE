@@ -17,6 +17,23 @@ class UpdateOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['description',  'technician_type', 'image', 'address','location']
+        
+        
+# class UpdateOrderSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Order
+#         fields = ['description', 'technician_type', 'image', 'address', 'location']
+
+    def update(self, instance, validated_data):
+        # Loop through the fields in the serializer's Meta class and update them
+        for field in self.Meta.fields:
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
+        # Save the instance to update the database
+        instance.save()
+
+        return instance
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
