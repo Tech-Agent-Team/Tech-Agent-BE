@@ -16,4 +16,4 @@ class Profession(models.Model):
     techProfession = models.TextField()
 
     def __str__(self):
-        return self.techProfession
+            return f"{self.technicianProfession.user.username} :  is a ( {self.techProfession}) "
