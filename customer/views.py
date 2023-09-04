@@ -79,12 +79,12 @@ class Customerdeletorders(ListAPIView):
         from_email = settings.EMAIL_HOST_USER
         recipient_list = [order.owner.user.email]
         send_mail(subject, message, from_email,recipient_list, fail_silently=False)
-        
-        subject = 'Order Was Cancelled'
-        message = f'Dear Technician,\n\nWe would like to inform you that order you accepted with ID {order_id}\n\n Order Description:\n\n {order.description}\n\n  has been deleted by the customer.\n\nIf you have any feedback or would like to provide us with any details to help improve our services, please feel free to contact us at ahmasamer51@gmail.com.\n\nThank you for choosing our services.\n\nSincerely,\nThe Tech Agent Team'
-        from_email = settings.EMAIL_HOST_USER
-        recipient_list = [order.current_technician.user.email]
-        send_mail(subject, message, from_email,recipient_list, fail_silently=False)
+        if order.current_technician :       
+            subject = 'Order Was Cancelled'
+            message = f'Dear Technician,\n\nWe would like to inform you that order you accepted with ID {order_id}\n\n Order Description:\n\n {order.description}\n\n  has been deleted by the customer.\n\nIf you have any feedback or would like to provide us with any details to help improve our services, please feel free to contact us at ahmasamer51@gmail.com.\n\nThank you for choosing our services.\n\nSincerely,\nThe Tech Agent Team'
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [order.current_technician.user.email]
+            send_mail(subject, message, from_email,recipient_list, fail_silently=False)
 
         order.delete()
         # Deletion successful

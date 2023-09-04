@@ -156,7 +156,7 @@ class TechnicianInfoUpdateProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = TechnicianUpdateProfileSerializer
 
     def get_object(self):
-        return self.request.user
+        return self.request.user.technicianprofile
 
     def put(self, request, *args, **kwargs):
         user = self.get_object()

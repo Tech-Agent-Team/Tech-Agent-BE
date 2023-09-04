@@ -105,10 +105,14 @@ class TechnicianUpdateProfileSerializer(serializers.ModelSerializer):
         instance.image = validated_data.get('image', instance.image)
         instance.description = validated_data.get('description', instance.description)
         
-        professions = validated_data.get('professions', [])
-        if professions is not None:
+        professions_string = validated_data.get('professions', [])
+        professions_list = professions_string[0].split(',')
+
+        print(professions_list)
+        if professions_list is not None:
             instance.professions.all().delete()
-            for profession in professions:
+            for profession in professions_list:
+                profession
                 Profession.objects.create(technicianProfession=instance, techProfession=profession)
         
         instance.save()
