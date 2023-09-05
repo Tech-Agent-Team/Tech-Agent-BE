@@ -86,11 +86,16 @@ class TechnicianAcceptedOrdersSerializers(serializers.ModelSerializer):
 
 
 
+class ProfessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profession
+        fields = ['techProfession']
+
 class TechnicianProfileSerializer(serializers.ModelSerializer):
     user = CustomUserWithNoPassword()
     average_rating = serializers.FloatField()
     feedback_list = serializers.ListField()
-    professions = serializers.StringRelatedField(many=True)  # Assuming 'professions' is a related field in TechnicianProfile
+    professions = ProfessionSerializer(many=True, source='professions.all')  # Use the related name 'professions.all'
 
     class Meta:
         model = TechnicianProfile
